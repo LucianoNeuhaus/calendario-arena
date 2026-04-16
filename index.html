@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arena Eldorado - Agendamentos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div id="global-loading" style="position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-dark); z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#fff;">
+        <div style="font-size: 3rem; margin-bottom: 1rem; animation: spin 1s linear infinite;">🔄</div>
+        <h2>Carregando base de dados...</h2>
+        <p style="color:var(--text-muted); margin-top:10px;">Conectando com Google Sheets</p>
+    </div>
+    <style>@keyframes spin { 100% { transform: rotate(360deg); } }</style>
+    <div class="app-background"></div>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar glass-panel">
+            <div class="logo">
+                <div class="logo-icon">🏐</div>
+                <h1>Arena Eldorado</h1>
+            </div>
+            <ul class="nav-links">
+                <li class="active" data-target="view-quadra">
+                    <span class="icon">📅</span> Agenda Quadra
+                </li>
+                <li data-target="view-funcional">
+                    <span class="icon">💪</span> Agenda Funcional
+                </li>
+                <li data-target="view-clientes">
+                    <span class="icon">👥</span> Clientes
+                </li>
+                <li data-target="view-dashboard">
+                    <span class="icon">📈</span> Dashboard Financeiro
+                </li>
+                <li data-target="view-backup">
+                    <span class="icon">💾</span> Backup / Config
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="content-area">
+            <!-- View: Agenda Quadra -->
+            <section id="view-quadra" class="view-section active">
+                <header class="view-header glass-panel">
+                    <h2>Agenda - Aluguel de Quadra</h2>
+                    <div class="header-actions">
+                        <button class="btn-primary" id="btn-novo-agendamento-quadra">
+                            <span class="icon">+</span> Novo Agendamento
+                        </button>
+                    </div>
+                </header>
+                <div class="view-body">
+                    <!-- Calendar View Toggle -->
+                    <div class="calendar-controls glass-panel">
+                        <div class="view-toggles">
+                            <button class="btn-toggle active" data-view="mensal">Mês</button>
+                            <button class="btn-toggle" data-view="semanal">Semana</button>
+                            <button class="btn-toggle" data-view="diario">Dia</button>
+                        </div>
+                        <div class="month-navigation">
+                            <button class="btn-icon" id="btn-prev-month-quadra">◀</button>
+                            <h3 id="current-month-quadra">Abril 2026</h3>
+                            <button class="btn-icon" id="btn-next-month-quadra">▶</button>
+                        </div>
+                    </div>
+                    <div class="calendar-container glass-panel" id="calendar-quadra">
+                        <!-- Calendar will be generated here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- View: Agenda Funcional -->
+            <section id="view-funcional" class="view-section">
+                <header class="view-header glass-panel">
+                    <h2>Agenda - Treinamento Funcional</h2>
+                    <div class="header-actions">
+                        <button class="btn-primary" id="btn-novo-agendamento-funcional">
+                            <span class="icon">+</span> Nova Turma
+                        </button>
+                    </div>
+                </header>
+                <div class="view-body">
+                    <div class="calendar-controls glass-panel">
+                        <div class="view-toggles">
+                            <button class="btn-toggle active" data-view="mensal">Mês</button>
+                            <button class="btn-toggle" data-view="semanal">Semana</button>
+                            <button class="btn-toggle" data-view="diario">Dia</button>
+                        </div>
+                        <div class="month-navigation">
+                            <button class="btn-icon" id="btn-prev-month-funcional">◀</button>
+                            <h3 id="current-month-funcional">Abril 2026</h3>
+                            <button class="btn-icon" id="btn-next-month-funcional">▶</button>
+                        </div>
+                    </div>
+                    <div class="calendar-container glass-panel" id="calendar-funcional">
+                        <!-- Calendar will be generated here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- View: Clientes -->
+            <section id="view-clientes" class="view-section">
+                <header class="view-header glass-panel">
+                    <h2>Gerenciar Clientes</h2>
+                    <div class="header-actions">
+                        <div class="search-box">
+                            <input type="text" id="search-cliente" placeholder="Buscar por nome ou telefone...">
+                        </div>
+                        <button class="btn-primary" id="btn-novo-cliente">
+                            <span class="icon">+</span> Novo Cliente
+                        </button>
+                    </div>
+                </header>
+                <div class="view-body">
+                    <div class="glass-panel table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Telefone</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="clients-list">
+                                <!-- Populated via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- View: Dashboard Financeiro -->
+            <section id="view-dashboard" class="view-section">
+                <header class="view-header glass-panel">
+                    <h2>Dashboard Financeiro</h2>
+                </header>
+                <div class="view-body">
+                    <div class="dashboard-grid">
+                        <div class="glass-panel dashboard-card">
+                            <h3>Este Mês (Arrecadado) <span class="badge badge-success">Pago</span></h3>
+                            <div class="stats">
+                                <p>Quadra: R$ <span id="dash-month-quadra-rec">0,00</span></p>
+                                <p>Funcional: R$ <span id="dash-month-func-rec">0,00</span></p>
+                                <hr class="divider" style="margin:16px 0;">
+                                <p class="total">Total Mês Atual: R$ <span id="dash-month-total-rec">0,00</span></p>
+                            </div>
+                        </div>
+                        <div class="glass-panel dashboard-card warning-card">
+                            <h3>Este Mês (Previsão Futura) <span class="badge badge-warning">A Receber</span></h3>
+                            <div class="stats">
+                                <p>Quadra: R$ <span id="dash-month-quadra-prev">0,00</span></p>
+                                <p>Funcional: R$ <span id="dash-month-func-prev">0,00</span></p>
+                                <hr class="divider" style="margin:16px 0;">
+                                <p class="total">Pendente Mês Atual: R$ <span id="dash-month-total-prev">0,00</span></p>
+                            </div>
+                        </div>
+                        <div class="glass-panel dashboard-card">
+                            <h3>Esta Semana (Arrecadado) <span class="badge badge-success">Pago</span></h3>
+                            <div class="stats">
+                                <p>Quadra: R$ <span id="dash-week-quadra-rec">0,00</span></p>
+                                <p>Funcional: R$ <span id="dash-week-func-rec">0,00</span></p>
+                                <hr class="divider" style="margin:16px 0;">
+                                <p class="total">Total Semana Atual: R$ <span id="dash-week-total-rec">0,00</span></p>
+                            </div>
+                        </div>
+                        <div class="glass-panel dashboard-card warning-card">
+                            <h3>Esta Semana (Previsão Futura) <span class="badge badge-warning">A Receber</span></h3>
+                            <div class="stats">
+                                <p>Quadra: R$ <span id="dash-week-quadra-prev">0,00</span></p>
+                                <p>Funcional: R$ <span id="dash-week-func-prev">0,00</span></p>
+                                <hr class="divider" style="margin:16px 0;">
+                                <p class="total">Pendente Semana Atual: R$ <span id="dash-week-total-prev">0,00</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- View: Backup -->
+            <section id="view-backup" class="view-section">
+                <header class="view-header glass-panel">
+                    <h2>Controle de Dados</h2>
+                </header>
+                <div class="view-body">
+                    <div class="glass-panel backup-card">
+                        <div class="card-content">
+                            <h3>Backup Seguro</h3>
+                            <p>Salve todas as informações de clientes e agendamentos num arquivo no seu computador.</p>
+                            <button class="btn-primary" id="btn-export-backup">Baixar Backup (JSON)</button>
+                        </div>
+                        <hr class="divider">
+                        <div class="card-content">
+                            <h3>Restaurar Backup</h3>
+                            <p>Importe um backup anterior. <strong>Aviso:</strong> Isso substituirá todos os dados
+                                atuais.</p>
+                            <input type="file" id="file-import-backup" accept=".json" style="display:none">
+                            <button class="btn-secondary" id="btn-trigger-import">Selecionar Arquivo</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modals Structure Placeholder -->
+    <div id="modal-backdrop" class="modal-backdrop hidden"></div>
+
+    <!-- Modal: Cliente -->
+    <div id="modal-cliente" class="modal hidden glass-panel">
+        <header class="modal-header">
+            <h3 id="modal-cliente-title">Novo Cliente</h3>
+            <button class="btn-close">×</button>
+        </header>
+        <div class="modal-body">
+            <form id="form-cliente">
+                <input type="hidden" id="cliente-id">
+                <div class="form-group">
+                    <label for="cliente-nome">Nome Completo</label>
+                    <input type="text" id="cliente-nome" required>
+                </div>
+                <div class="form-group">
+                    <label for="cliente-telefone">Telefone</label>
+                    <input type="tel" id="cliente-telefone" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Salvar Cliente</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Agendamento Quadra -->
+    <div id="modal-quadra" class="modal hidden glass-panel">
+        <header class="modal-header">
+            <h3 id="modal-quadra-title">Agendamento de Quadra</h3>
+            <button class="btn-close">×</button>
+        </header>
+        <div class="modal-body">
+            <form id="form-quadra">
+                <input type="hidden" id="quadra-id">
+
+                <div class="form-group search-box" style="margin-bottom: 20px;">
+                    <label for="quadra-cliente-search">Cliente (Busca ou Novo)</label>
+                    <input type="text" id="quadra-cliente-search" placeholder="Digite o nome..." required
+                        style="width: 100%">
+                    <div id="quadra-cliente-autocomplete"
+                        style="position:absolute; background:var(--bg-dark); width:calc(100% - 48px); max-height:150px; overflow-y:auto; border-radius: 4px; display:none; border:1px solid var(--glass-border); z-index:1000;">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="quadra-telefone">Telefone</label>
+                    <input type="tel" id="quadra-telefone" required>
+                </div>
+
+                <div style="display:flex; gap: 16px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label for="quadra-data">Data</label>
+                        <input type="date" id="quadra-data" required>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="quadra-hora">Horário</label>
+                        <input type="time" id="quadra-hora" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="quadra-valor">Valor Pago (R$)</label>
+                    <input type="number" id="quadra-valor" value="100.00" step="0.01" required>
+                </div>
+
+                <div class="form-group" id="quadra-recurrence-container">
+                    <label style="display:flex; align-items:center; gap:8px;">
+                        <input type="checkbox" id="quadra-is-recurring" style="width:auto;"> Agendamento Recorrente
+                    </label>
+                    <div id="quadra-recurrence-options"
+                        style="display:none; margin-top:12px; padding:12px; background:rgba(0,0,0,0.2); border-radius:8px;">
+                        <label>Repetir a cada (dias):</label>
+                        <input type="number" id="quadra-recurrence-days" value="7" min="1" max="365">
+                        <label style="margin-top:8px;">Quantas vezes (ocorrências):</label>
+                        <input type="number" id="quadra-recurrence-count" value="4" min="2" max="52">
+                    </div>
+                </div>
+
+                <div class="form-actions" style="justify-content: space-between;">
+                    <button type="button" id="btn-delete-quadra" class="btn-secondary"
+                        style="background:var(--danger); display:none;">Excluir</button>
+                    <button type="submit" class="btn-primary">Salvar Agendamento</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Agendamento Funcional -->
+    <div id="modal-funcional" class="modal hidden glass-panel">
+        <header class="modal-header">
+            <h3 id="modal-funcional-title">Turma Funcional</h3>
+            <button class="btn-close">×</button>
+        </header>
+        <div class="modal-body">
+            <form id="form-funcional">
+                <input type="hidden" id="funcional-id">
+
+                <div style="display:flex; gap: 16px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label for="funcional-data">Data</label>
+                        <input type="date" id="funcional-data" required>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="funcional-hora">Horário</label>
+                        <input type="time" id="funcional-hora" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="funcional-valor">Valor Cobrado (Total ou Padrão) R$</label>
+                    <input type="number" id="funcional-valor" value="60.00" step="0.01" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Participantes da Turma</label>
+                    <div style="display:flex; gap:8px; margin-bottom:8px;">
+                        <input type="text" id="funcional-add-participant" placeholder="Nome do aluno..."
+                            style="flex:1;">
+                        <button type="button" id="btn-add-participant" class="btn-secondary">+</button>
+                    </div>
+                    <ul id="funcional-participants-list"
+                        style="list-style:none; padding:0; background:rgba(0,0,0,0.2); border-radius:8px; max-height:150px; overflow-y:auto;">
+                        <!-- JS injects here -->
+                    </ul>
+                </div>
+
+                <div class="form-actions" style="justify-content: space-between;">
+                    <button type="button" id="btn-delete-funcional" class="btn-secondary"
+                        style="background:var(--danger); display:none;">Excluir Turma</button>
+                    <button type="submit" class="btn-primary">Salvar Turma</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="store.js"></script>
+    <script src="calendar.js"></script>
+    <script src="forms.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
