@@ -27,7 +27,30 @@ const Store = (function () {
             }
 
             localClients = data.clients || [];
-            localBookings = data.bookings || [];
+
+            // Tratamento especial para os dados vindos do Google Sheets
+            localBookings = (data.bookings || []).map(b => {
+                // Corrige digitação acidental de 'clienteName' na planilha
+                if (b.clienteName && !b.clientName) {
+                    b.clientName = b.clienteName;
+                }
+
+                // Formata datas convertidas em timezone pelo Google (ex: 2026-04-17T03... -> 2026-04-17)
+                if (b.date && typeof b.date === 'string' && b.date.includes('T')) {
+                    b.date = b.date.substring(0, 10);
+                }
+
+                // Formata horas baseadas em 1899 do Google (ex: 1899-12-30T23:06... -> 20:00)
+                if (b.time && typeof b.time === 'string' && b.time.includes('T')) {
+                    const dt = new Date(b.time);
+                    const h = String(dt.getHours()).padStart(2, '0');
+                    const m = String(dt.getMinutes()).padStart(2, '0');
+                    b.time = `${h}:${m}`;
+                }
+
+                return b;
+            });
+
 
             // Grava um cache offline
             localStorage.setItem('arena_clientes_cache', JSON.stringify(localClients));
