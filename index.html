@@ -10,12 +10,19 @@
 </head>
 
 <body>
-    <div id="global-loading" style="position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-dark); z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#fff;">
+    <div id="global-loading"
+        style="position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-dark); z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#fff;">
         <div style="font-size: 3rem; margin-bottom: 1rem; animation: spin 1s linear infinite;">🔄</div>
         <h2>Carregando base de dados...</h2>
         <p style="color:var(--text-muted); margin-top:10px;">Conectando com Google Sheets</p>
     </div>
-    <style>@keyframes spin { 100% { transform: rotate(360deg); } }</style>
+    <style>
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
     <div class="app-background"></div>
     <div class="app-container">
         <!-- Sidebar Navigation -->

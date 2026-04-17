@@ -3,7 +3,7 @@
 const Store = (function () {
     // IMPORTANTE: Insira aqui a URL do seu app web gerado no Google Apps Script
     // Exemplo: 'https://script.google.com/macros/s/AKfycb.../exec'
-    const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzilMoCGGk_mwUqMKw74Rr1FgdRcvdddaYfy8tNfZAYGq19PnM7F3YWIATpKauh9tfn/exec';
+    const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwj0t4gqZUoLQ3spfjGKVV55qjcf9wwQ3bIZTxHrhExBA8LmQh2vGmDGs2dI_O218s9/exec';
 
     let localClients = [];
     let localBookings = [];
